@@ -1,0 +1,1277 @@
+<title>Second Thought</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Martian+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+<style>
+  :root {
+    --ground: #EDEFEB;
+    --surface: #F7F8F5;
+    --raised: #FFFFFF;
+    --ink: #191F2C;
+    --ink-2: #3B4354;
+    --muted: #667085;
+    --faint: #9AA1AE;
+    --line: #D8DBD5;
+    --line-2: #C3C8C0;
+    --lucid: #3450C0;
+    --focus-ring: rgba(52, 80, 192, .18);
+    --pro: #2B8352;  --pro-bg: #E0EEE4;
+    --con: #BD4436;  --con-bg: #F5E2DE;
+    --mid: #A07406;  --mid-bg: #F2E9D1;
+    --unk: #7D8493;  --unk-bg: #E4E6E3;
+    --voice: "Newsreader", "Iowan Old Style", Georgia, serif;
+    --ui: "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "Martian Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #0E1117; --surface: #151922; --raised: #1B202B;
+      --ink: #E6E8ED; --ink-2: #C0C6D1; --muted: #8C94A3; --faint: #636B7A;
+      --line: #252B36; --line-2: #343B49;
+      --lucid: #91A6F5; --focus-ring: rgba(145, 166, 245, .22);
+      --pro: #62C28F; --pro-bg: #15281E;
+      --con: #F07E70; --con-bg: #2F1B19;
+      --mid: #E3B955; --mid-bg: #2A2415;
+      --unk: #8A92A1; --unk-bg: #1F242D;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #0E1117; --surface: #151922; --raised: #1B202B;
+    --ink: #E6E8ED; --ink-2: #C0C6D1; --muted: #8C94A3; --faint: #636B7A;
+    --line: #252B36; --line-2: #343B49;
+    --lucid: #91A6F5; --focus-ring: rgba(145, 166, 245, .22);
+    --pro: #62C28F; --pro-bg: #15281E;
+    --con: #F07E70; --con-bg: #2F1B19;
+    --mid: #E3B955; --mid-bg: #2A2415;
+    --unk: #8A92A1; --unk-bg: #1F242D;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { background: var(--ground); }
+  body {
+    margin: 0; color: var(--ink);
+    font: 400 16px/1.55 var(--ui);
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  button:disabled { cursor: default; opacity: .5; }
+  :focus-visible { outline: 2px solid var(--lucid); outline-offset: 2px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  p { margin: 0; }
+
+  /* semantic signal: every coloured thing reads --c / --cb */
+  .pro { --c: var(--pro); --cb: var(--pro-bg); }
+  .con { --c: var(--con); --cb: var(--con-bg); }
+  .mid { --c: var(--mid); --cb: var(--mid-bg); }
+  .unk { --c: var(--unk); --cb: var(--unk-bg); }
+
+  .label {
+    font-family: var(--mono); font-size: 10.5px; font-weight: 500;
+    letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin: 0;
+  }
+  .label .opt { letter-spacing: .04em; text-transform: none; color: var(--faint); font-weight: 400; margin-left: 6px; }
+
+  /* ---------- frame ---------- */
+  .app { max-width: 1100px; margin: 0 auto; padding-inline: 20px; padding-block: 12px 48px; display: flex; flex-direction: column; gap: 34px; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 10px 16px; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); font-family: var(--voice); font-size: 22px; letter-spacing: -.01em; }
+  .brand svg { width: 44px; height: 16px; overflow: visible; }
+  .brand path { fill: none; stroke: var(--ink); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+  .modes { display: flex; gap: 2px; }
+  .modes button { position: relative; background: none; border: 0; padding: 8px 12px; font-size: 15px; font-weight: 500; color: var(--muted); border-radius: 8px; }
+  .modes button:hover { color: var(--ink); }
+  .modes button[aria-selected="true"] { color: var(--ink); }
+  .modes button[aria-selected="true"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 1px; height: 2px; border-radius: 2px; background: var(--ink); }
+
+  .shell { display: grid; grid-template-columns: minmax(0, 1fr) 268px; gap: 64px; align-items: start; }
+  main { min-width: 0; max-width: 680px; }
+  .rail { display: flex; flex-direction: column; gap: 34px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); }
+  @media (max-width: 880px) {
+    .shell { grid-template-columns: minmax(0, 1fr); gap: 44px; }
+    .rail { position: static; max-width: 680px; }
+  }
+  .foot { font-size: 12.5px; color: var(--faint); border-top: 1px solid var(--line); padding-top: 16px; max-width: 680px; }
+
+  /* ---------- shared controls ---------- */
+  .voice-q { display: block; margin: 0; font-family: var(--voice); font-weight: 400; font-size: clamp(28px, 4.4vw, 38px); line-height: 1.12; letter-spacing: -.015em; text-wrap: balance; }
+  .btn-primary { background: var(--ink); color: var(--ground); border: 0; border-radius: 12px; padding: 12px 20px; font-weight: 600; font-size: 15.5px; }
+  .btn-primary:hover:not(:disabled) { opacity: .9; }
+  .btn { background: var(--raised); border: 1px solid var(--line-2); border-radius: 12px; padding: 10px 16px; font-weight: 500; font-size: 15px; }
+  .btn:hover:not(:disabled) { border-color: var(--ink); }
+  .link { background: none; border: 0; padding: 0; color: var(--ink); font-size: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); }
+  .link:hover { text-decoration-color: var(--ink); }
+  .field { flex: 1; min-width: 0; background: var(--raised); border: 1px solid var(--line-2); border-radius: 12px; padding: 10px 14px; font-size: 16px; }
+  .field:focus, #q:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px var(--focus-ring); }
+  .field::placeholder, #q::placeholder { color: var(--faint); }
+  .pill { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 11px; font-size: 13.5px; color: var(--muted); }
+  .pill:hover { color: var(--ink); border-color: var(--line-2); }
+  .tag { font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; border: 1px dashed var(--line-2); border-radius: 999px; padding: 2px 8px; color: var(--muted); }
+  .chip { font-family: var(--mono); font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; padding: 3px 7px; border-radius: 999px; background: var(--cb); color: var(--c); }
+  .chip.unk { color: var(--muted); }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--unk)); flex: none; }
+  .muted { color: var(--muted); }
+  .small { font-size: 13.5px; }
+
+  /* state (one tap, optional) */
+  .state-row { display: flex; flex-direction: column; gap: 8px; }
+  .moods { display: flex; flex-wrap: wrap; gap: 6px; }
+  .mood { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 12px 5px 9px; font-size: 13.5px; color: var(--muted); }
+  .mood:hover { color: var(--ink); border-color: var(--line-2); }
+  .mood svg { width: 28px; height: 12px; overflow: visible; flex: none; }
+  .mood path { fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+  .mood .w-foggy { stroke-dasharray: 1.4 2.4; }
+  .mood.on { border-color: var(--ink); color: var(--ink); background: var(--raised); }
+
+  /* ---------- decide ---------- */
+  #view-decide { display: flex; flex-direction: column; gap: 28px; }
+  .ask { display: flex; flex-direction: column; gap: 14px; }
+  #q { width: 100%; resize: none; min-height: 66px; background: var(--raised); border: 1px solid var(--line-2); border-radius: 14px; padding: 14px 16px; font-size: 18px; line-height: 1.45; }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ask-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding-top: 4px; }
+  .hint { font-size: 13.5px; color: var(--muted); }
+  .notice { font-size: 14.5px; color: var(--con); }
+  .pending { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); font-size: 14.5px; }
+  .pending .p-text { font-weight: 500; }
+  .pending .p-left { font-family: var(--mono); font-size: 12px; color: var(--mid); font-variant-numeric: tabular-nums; }
+
+  .thinking { display: flex; flex-direction: column; gap: 10px; }
+  #trace { display: block; width: 100%; height: 72px; }
+  .think-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; font-size: 14.5px; color: var(--muted); }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 22px; }
+  @media (max-width: 520px) { .card { padding: 18px; border-radius: 14px; gap: 20px; } }
+  .r-meta { display: flex; align-items: center; gap: 10px; }
+  .considering { font-family: var(--voice); font-size: 27px; line-height: 1.2; letter-spacing: -.01em; margin-top: 6px; text-wrap: balance; }
+  .headline { margin-top: 8px; color: var(--ink-2); font-size: 16px; }
+
+  .impact { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .cell { border-radius: 12px; padding: 10px 12px 11px; display: flex; flex-direction: column; gap: 1px; background: var(--cb); }
+  .cell .sign { font-family: var(--mono); font-size: 22px; line-height: 1.15; font-weight: 500; color: var(--c); }
+  .cell .note { font-size: 13.5px; line-height: 1.3; color: var(--ink-2); }
+  @media (max-width: 420px) { .cell { padding: 9px 10px; } .cell .note { font-size: 12.5px; } }
+
+  .whys { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 520px) { .whys { grid-template-columns: 1fr; gap: 16px; } }
+  .whys .label { color: var(--c); }
+  .dots { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .dots li { position: relative; padding-left: 16px; font-size: 15.5px; line-height: 1.4; }
+  .dots li::before { content: ""; position: absolute; left: 0; top: .5em; width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+
+  .goal-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 15px; }
+  .goal-line b { font-weight: 600; }
+  .goal-line .eff { color: var(--c); font-weight: 500; }
+  .goal-line .gnote { flex-basis: 100%; color: var(--ink-2); font-size: 14.5px; padding-left: 18px; }
+
+  .flags { display: flex; flex-direction: column; gap: 12px; }
+  .flag { display: grid; grid-template-columns: 8px 1fr; gap: 12px; align-items: start; }
+  .flag .dot { margin-top: .55em; }
+  .flag b { font-weight: 600; font-size: 15px; }
+  .flag p { margin-top: 1px; font-size: 14.5px; color: var(--ink-2); }
+
+  .check { display: grid; grid-template-columns: 12px 1fr; gap: 12px; align-items: start; padding: 12px 14px; border-radius: 12px; background: var(--mid-bg); }
+  .half { width: 12px; height: 12px; margin-top: 2px; border-radius: 50%; border: 1.5px solid var(--mid); background: linear-gradient(90deg, var(--mid) 50%, transparent 50%); }
+  .check p { margin-top: 3px; font-size: 15px; }
+
+  .stopping { display: flex; flex-direction: column; gap: 8px; }
+  .stop-bar { position: relative; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .stop-bar span { position: absolute; inset: 0 63% 0 0; background: var(--unk); }
+  .stop-legend { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; letter-spacing: .05em; color: var(--muted); }
+  .stopping p { font-size: 15px; }
+
+  .dims { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13.5px; color: var(--muted); }
+  .dims span { display: inline-flex; align-items: center; gap: 7px; }
+  .dims b { color: var(--ink); font-weight: 500; }
+
+  .sep { border: 0; border-top: 1px solid var(--line); margin: 0; }
+  .read .head, .alt .head { display: flex; align-items: center; gap: 10px; }
+  .read .voice { margin-top: 8px; font-family: var(--voice); font-style: italic; font-size: 20px; line-height: 1.4; }
+  .alt { border: 1px dashed var(--line-2); border-radius: 12px; padding: 12px 14px 13px; }
+  .alt p { margin-top: 6px; font-size: 16px; }
+  .unknown { display: flex; gap: 10px; font-size: 14px; color: var(--muted); }
+  .unknown .q { font-family: var(--mono); font-size: 12px; color: var(--unk); border: 1px solid var(--line-2); border-radius: 50%; width: 18px; height: 18px; display: grid; place-items: center; flex: none; margin-top: 1px; }
+
+  .r-foot { display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--line); padding-top: 18px; }
+  .choices { display: flex; flex-wrap: wrap; gap: 8px; }
+  .choice { flex: 1 1 130px; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 12px 14px; }
+  .choice.is-lean { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+  .lean-mark { font-family: var(--mono); font-size: 9px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .decided p { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14.5px; }
+
+  .wait { display: grid; grid-template-columns: 56px 1fr; gap: 18px; align-items: start; }
+  .ring { width: 56px; height: 56px; }
+  .ring-bg { fill: none; stroke: var(--line); stroke-width: 3; }
+  .ring-fg { fill: none; stroke: var(--mid); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 119.38; transform: rotate(-90deg); transform-origin: 22px 22px; transition: stroke-dashoffset 1s linear; }
+  .wait-body { display: flex; flex-direction: column; gap: 6px; }
+  .wait-time { font-family: var(--mono); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .wait-body .choices { margin-top: 6px; }
+
+  .safety h2 { font-family: var(--voice); font-weight: 400; font-size: 26px; line-height: 1.2; margin: 6px 0 0; text-wrap: balance; }
+  .safety > p { font-size: 16px; }
+  .help { display: flex; flex-direction: column; gap: 10px; }
+  .help li { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 12px; background: var(--raised); border: 1px solid var(--line); font-size: 15px; }
+  .num { font-family: var(--mono); font-size: 16px; font-weight: 500; user-select: all; }
+  .help a { color: var(--ink); text-underline-offset: 3px; }
+
+  .sc { display: grid; grid-template-columns: 92px 1fr; gap: 10px 14px; align-items: baseline; }
+  .sc p { font-size: 15.5px; }
+
+  .fresh > * { animation: rise .5s cubic-bezier(.2, .7, .2, 1) both; }
+  .fresh > *:nth-child(2) { animation-delay: .04s; } .fresh > *:nth-child(3) { animation-delay: .08s; }
+  .fresh > *:nth-child(4) { animation-delay: .12s; } .fresh > *:nth-child(5) { animation-delay: .16s; }
+  .fresh > *:nth-child(6) { animation-delay: .2s; }  .fresh > *:nth-child(7) { animation-delay: .24s; }
+  .fresh > *:nth-child(n+8) { animation-delay: .28s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } }
+  @media (prefers-reduced-motion: reduce) { .fresh > * { animation: none; } .ring-fg { transition: none; } }
+
+  /* ---------- today ---------- */
+  #view-today { display: flex; flex-direction: column; gap: 26px; }
+  .t-head { display: flex; flex-direction: column; gap: 8px; }
+  #dayBody { display: flex; flex-direction: column; gap: 24px; }
+  .example-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14px; color: var(--muted); }
+  .day-note { font-family: var(--voice); font-style: italic; font-size: 20px; line-height: 1.4; color: var(--ink-2); }
+  .progress { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 14.5px; }
+  .segs { display: flex; gap: 4px; }
+  .segs i { width: 22px; height: 6px; border-radius: 3px; background: var(--line); }
+  .segs i.on { background: var(--pro); }
+  .tier { display: flex; flex-direction: column; gap: 2px; }
+  .tier-head { display: flex; align-items: baseline; gap: 10px; padding-bottom: 4px; }
+  .item { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 10px 2px; border-bottom: 1px solid var(--line); }
+  .check-btn { width: 22px; height: 22px; padding: 0; border-radius: 50%; border: 1.5px solid var(--line-2); background: transparent; position: relative; }
+  .check-btn:hover { border-color: var(--ink); }
+  .check-btn[aria-pressed="true"] { background: var(--pro); border-color: var(--pro); }
+  .check-btn[aria-pressed="true"]::after { content: ""; position: absolute; left: 6.5px; top: 3.5px; width: 5px; height: 9px; border: solid var(--surface); border-width: 0 2px 2px 0; transform: rotate(45deg); }
+  .item .main { display: block; font-size: 15.5px; line-height: 1.35; overflow-wrap: anywhere; }
+  .item .sub { display: block; font-size: 13px; color: var(--muted); margin-top: 1px; }
+  .item.done .main { color: var(--faint); text-decoration: line-through; text-decoration-color: var(--line-2); }
+  .tier-chip { font-family: var(--mono); font-size: 9.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 3px 8px; background: transparent; color: var(--muted); }
+  .tier-chip:hover { border-color: var(--ink); color: var(--ink); }
+  .tier-chip.t-must { color: var(--ink); border-color: var(--line-2); }
+  .x { background: none; border: 0; color: var(--faint); font-size: 18px; line-height: 1; padding: 4px 6px; border-radius: 6px; }
+  .x:hover { color: var(--ink); }
+  .stretch { border: 1px dashed var(--line-2); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .stretch .examples { margin-top: 2px; }
+  .add { display: flex; gap: 8px; }
+  .day-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+  .empty { color: var(--muted); font-size: 15px; }
+
+  /* ---------- rail ---------- */
+  .rail-block { display: flex; flex-direction: column; gap: 10px; }
+  .goals li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .goals li.empty { border: 0; font-size: 14px; }
+  .goal-form { display: flex; gap: 6px; }
+  .goal-form .field { font-size: 14.5px; padding: 8px 12px; border-radius: 10px; }
+  .goal-form .btn { padding: 8px 12px; font-size: 14px; border-radius: 10px; }
+  .recent { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 9px 0; font-size: 14.5px; }
+  .recent:hover .r-text { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); }
+  .r-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+
+<div class="app">
+  <header class="top">
+    <a class="brand" href="#decide" data-act="view" data-view="decide">
+      <svg viewBox="0 0 44 16" aria-hidden="true"><path id="brandPath" d=""></path></svg>
+      <span>Second Thought</span>
+    </a>
+    <nav class="modes" role="tablist" aria-label="Mode">
+      <button type="button" role="tab" id="tab-decide" aria-controls="view-decide" aria-selected="true" data-act="view" data-view="decide">Decide</button>
+      <button type="button" role="tab" id="tab-today" aria-controls="view-today" aria-selected="false" data-act="view" data-view="today">Today</button>
+    </nav>
+  </header>
+
+  <div class="shell">
+    <main>
+      <section id="view-decide" role="tabpanel" aria-labelledby="tab-decide">
+        <div id="pending" class="pending" hidden></div>
+        <form id="ask" class="ask" autocomplete="off">
+          <label for="q" class="voice-q">What are you about to do?</label>
+          <textarea id="q" rows="2" maxlength="1500" placeholder="I want to buy this €15 bottle of wine"></textarea>
+          <div class="examples" aria-label="Examples">
+            <button type="button" class="pill" data-act="example" data-text="Buy a €15 bottle of wine tonight">€15 bottle of wine</button>
+            <button type="button" class="pill" data-act="example" data-text="Skip the gym tonight, it's raining and I'm tired">Skip the gym</button>
+            <button type="button" class="pill" data-act="example" data-text="Keep looking at apartments. I've already seen 12 and two were fine">Keep searching apartments</button>
+            <button type="button" class="pill" data-act="example" data-text="Reply to my landlord right now, I'm really angry">Reply while angry</button>
+            <button type="button" class="pill" data-act="example" data-text="Play one more hour of games instead of starting the report due tomorrow">One more hour of games</button>
+          </div>
+          <div class="state-row" id="state-decide"></div>
+          <div class="ask-actions">
+            <button type="submit" class="btn-primary" id="thinkBtn">Think it through</button>
+            <span class="hint" id="thinkHint">About 30 seconds. You still decide.</span>
+          </div>
+          <p class="notice" id="notice" hidden></p>
+        </form>
+
+        <div class="thinking" id="thinking" hidden>
+          <canvas id="trace" aria-hidden="true"></canvas>
+          <p class="think-line"><span id="thinkStatus">Looking at the next few hours</span><button type="button" class="link" data-act="stop">Stop</button></p>
+        </div>
+
+        <div id="result" aria-live="polite"></div>
+      </section>
+
+      <section id="view-today" role="tabpanel" aria-labelledby="tab-today" hidden>
+        <header class="t-head">
+          <p class="label" id="todayDate"></p>
+          <h1 class="voice-q">A day you can actually finish.</h1>
+        </header>
+        <div class="state-row" id="state-today"></div>
+        <div id="dayBody"></div>
+        <form id="addForm" class="add" autocomplete="off">
+          <label for="addInput" class="sr">Add something for today</label>
+          <input id="addInput" class="field" maxlength="80" placeholder="Add something for today">
+          <button type="submit" class="btn">Add</button>
+        </form>
+        <div class="day-tools">
+          <button type="button" class="btn" id="sortBtn" data-act="sort">Sort my day</button>
+          <span class="hint" id="sortStatus">Claude splits it into must, should and could, and finds a 5-minute version of each.</span>
+        </div>
+      </section>
+    </main>
+
+    <aside class="rail" aria-label="Goals and history">
+      <section class="rail-block">
+        <h2 class="label">Long-term goals</h2>
+        <ul class="goals" id="goals"></ul>
+        <form class="goal-form" id="goalForm" autocomplete="off">
+          <label for="goalInput" class="sr">Add a long-term goal</label>
+          <input id="goalInput" class="field" maxlength="60" placeholder="Add a goal">
+          <button type="submit" class="btn">Add</button>
+        </form>
+        <p class="small muted" id="goalsNote">These are examples. Add your own and they disappear. Every decision gets weighed against this list.</p>
+      </section>
+      <section class="rail-block" id="recentBlock" hidden>
+        <h2 class="label">Recent decisions</h2>
+        <ul id="recent"></ul>
+        <p class="small muted" id="waitStat" hidden></p>
+      </section>
+    </aside>
+  </div>
+
+  <footer class="foot">Second Thought helps you reason. It isn’t a doctor, therapist, lawyer, financial advisor or emergency service.</footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ======================= Capacity-aware day ======================= */
+/**
+ * Adapts today's plan to how much capacity the person has right now.
+ *   groups: { must, should, could }: arrays of items { id, text, tier, small, done }
+ *   state:  'good' | 'okay' | 'low' | 'overwhelmed' | 'energized' | 'foggy' | null
+ *           (null = not set, or set more than 8 hours ago)
+ * Return:
+ *   note                 one calm sentence shown above the plan, or ''
+ *   must, should, could  the items to show in each group; anything left out is tucked away, not deleted
+ *   optional             true labels Should and Could as optional today
+ *   small                true shows each task's 5-minute version first
+ *   stretch              true offers one extra task toward a long-term goal
+ */
+function shapeDay(groups, state) {
+  // TODO(human): shape the plan by state. Until then every state gets the full, unchanged day.
+  return { note: '', ...groups, optional: false, small: false, stretch: false };
+}
+
+/* ======================= helpers ======================= */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const newId = () => Math.random().toString(36).slice(2, 10);
+const todayStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const TIERS = ['must', 'should', 'could'];
+const MOOD_TTL = 8 * 3600e3;
+const MOODS = [
+  { key: 'good', label: 'Good' },
+  { key: 'okay', label: 'Okay' },
+  { key: 'low', label: 'Low' },
+  { key: 'overwhelmed', label: 'Overwhelmed' },
+  { key: 'energized', label: 'Energized' },
+  { key: 'foggy', label: 'Foggy' },
+];
+
+/* Each state is drawn as its own trace: calm, flat, sinking, jagged, spiking, dotted. */
+function waveY(kind, u) {
+  switch (kind) {
+    case 'good': return Math.sin(u * Math.PI * 4) * 0.55;
+    case 'okay': return Math.sin(u * Math.PI * 3) * 0.2;
+    case 'low': return 0.55 - u * 1.1 + Math.sin(u * Math.PI * 6) * 0.1;
+    case 'overwhelmed': return (Math.sin(u * 47) * 0.5 + Math.sin(u * 113) * 0.35 + Math.sin(u * 29 + 1) * 0.3) * 0.9;
+    case 'energized': return Math.pow(Math.abs(Math.sin(u * Math.PI * 3)), 4) * 1.7 - 0.7;
+    case 'foggy': return Math.sin(u * Math.PI * 2.5) * 0.3;
+    case 'brand': {
+      const noise = (Math.sin(u * 61) * 0.5 + Math.sin(u * 137) * 0.35 + Math.sin(u * 23) * 0.4) * Math.pow(1 - u, 1.4);
+      return noise * 1.05 + Math.sin(u * Math.PI * 3.5) * 0.45 * u;
+    }
+  }
+  return 0;
+}
+function wavePath(kind, w, h, step = 1) {
+  let d = '';
+  for (let x = 0; x <= w + 1e-6; x += step) {
+    const y = h / 2 - Math.max(-1, Math.min(1, waveY(kind, x / w))) * (h / 2 - 1);
+    d += (x ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(2);
+  }
+  return d;
+}
+const WAVES = Object.fromEntries(MOODS.map((m) => [m.key, wavePath(m.key, 28, 12)]));
+
+/* ======================= example content (shown until there's real data) ======================= */
+const EXAMPLE_GOALS = ['Sleep better', 'Improve financial stability', 'Build my app', 'Learn Spanish', 'Keep in touch with friends'];
+const EXAMPLE_DAY = [
+  ['Eat a proper meal', 'must', 'Eat something simple'],
+  ['Send the housing email', 'must', 'Write the first two lines'],
+  ['Work on the project, 30 min', 'must', 'Open it and fix one small thing'],
+  ['Grocery shopping', 'should', 'Buy tomorrow’s breakfast only'],
+  ['Spanish, 15 min', 'should', 'One 5-minute lesson'],
+  ['Go for a walk', 'could', 'Walk around the block'],
+  ['Play a game', 'could', ''],
+  ['Watch something', 'could', ''],
+];
+const exampleDay = () => EXAMPLE_DAY.map(([text, tier, small], i) => ({ id: 'ex' + i, text, tier, small, done: false }));
+const EXAMPLE_RESULT = {
+  considering: 'Buy a €15 bottle of wine tonight',
+  headline: 'The enjoyment is mostly tonight. The main cost may land tomorrow.',
+  why: ['Enjoyable tonight', 'Fits a normal treat budget', 'Could be social'],
+  whyNot: ['May disrupt sleep', 'Could dent tomorrow’s energy', 'Might be boredom, not wanting wine'],
+  impact: { now: { sign: '+', note: 'Enjoyment' }, tomorrow: { sign: '-', note: 'Sleep, energy' }, longTerm: { sign: '~', note: 'Neutral' } },
+  goals: [{ name: 'Sleep better', effect: 'conflicts', note: 'Alcohol in the evening tends to make sleep lighter.' }],
+  flags: [
+    { type: 'red', label: 'Immediate reward, delayed cost', why: 'The upside is tonight and the likely downside arrives tomorrow morning, which makes the cost easy to underweight.' },
+    { type: 'green', label: 'Cheap and reversible', why: '€15 is a small one-off amount, and nothing here locks you in.' },
+  ],
+  check: { pattern: 'Present bias', text: 'This may be present bias: tonight’s reward is getting more weight than tomorrow’s cost.' },
+  stopping: null,
+  dims: { effort: 'low', reversibility: 'easy', risk: 'low', reward: 'medium' },
+  lean: 'wait',
+  reasoning: 'Waiting 20 minutes keeps the same option open while lowering the chance this is an impulse. If you still want it after doing something enjoyable, that’s a clearer yes.',
+  alternative: 'Buy a drink you genuinely enjoy that won’t touch tomorrow, like a good non-alcoholic beer.',
+  waitMinutes: 20,
+  unknown: 'I don’t know if this is for a dinner with friends. That would raise the social value.',
+  safety: null,
+};
+
+/* ======================= state ======================= */
+const S = {
+  view: 'decide',
+  goals: EXAMPLE_GOALS.slice(), goalsExample: true,
+  mood: null,
+  day: { date: todayStr(), items: exampleDay() }, dayExample: true,
+  log: [],
+  result: null, resultExample: false, resultEntry: null,
+  claudeOff: false, thinking: false, sorting: false, showTucked: false,
+};
+
+function currentMood() {
+  if (!S.mood || !S.mood.at || Date.now() - S.mood.at > MOOD_TTL) return null;
+  return MOODS.find((m) => m.key === S.mood.key) || null;
+}
+
+/* ======================= persistence ======================= */
+// Browser storage is a fast local cache; the artifact's db (private per person) is the record when available.
+const LS = {
+  get(k) { try { const v = localStorage.getItem('st:' + k); return v ? JSON.parse(v) : null; } catch { return null; } },
+  set(k, v) { try { localStorage.setItem('st:' + k, JSON.stringify(v)); } catch {} },
+};
+const Store = {
+  db: null, uid: null, timers: {}, chains: {},
+  snapshot(key) {
+    if (key === 'profile') return { goals: S.goalsExample ? null : S.goals, mood: S.mood };
+    if (key === 'today') return { date: S.day.date, items: S.dayExample ? null : S.day.items };
+    return { entries: S.log.slice(0, 30) };
+  },
+  save(key) {
+    LS.set(key, this.snapshot(key));
+    if (!this.db || !this.uid) return;
+    clearTimeout(this.timers[key]);
+    this.timers[key] = setTimeout(() => {
+      const payload = this.snapshot(key);
+      const ref = this.db.doc('data/users/' + this.uid + '/' + key);
+      this.chains[key] = (this.chains[key] || Promise.resolve())
+        .then(() => ref.set(payload))
+        .catch((e) => {
+          console.warn('Second Thought: could not save ' + key, e && e.code);
+          if (e && (e.code === 'invalid_argument' || e.code === 'revoked')) this.db = null; // keep working from this browser
+        });
+    }, 600);
+  },
+};
+const normItem = (i) => ({
+  id: String(i.id || newId()), text: String(i.text || '').slice(0, 80),
+  tier: TIERS.includes(i.tier) ? i.tier : 'should', small: String(i.small || '').slice(0, 80),
+  done: !!i.done, stretch: !!i.stretch,
+});
+const APPLY = {
+  profile(p) {
+    if (!p) return;
+    if (Array.isArray(p.goals)) { S.goals = p.goals.map(String).filter(Boolean).slice(0, 8); S.goalsExample = false; }
+    if (p.mood && p.mood.key) S.mood = p.mood;
+  },
+  today(t) {
+    if (!t || !Array.isArray(t.items)) return;
+    S.day = { date: t.date || todayStr(), items: t.items.filter((i) => i && i.text).map(normItem) };
+    S.dayExample = false;
+  },
+  log(l) { if (l && Array.isArray(l.entries)) S.log = l.entries.filter((e) => e && e.id && e.text); },
+};
+
+function rollDay() {
+  const t = todayStr();
+  if (S.day.date === t) return;
+  if (S.dayExample) { S.day.date = t; return; }
+  S.day = { date: t, items: S.day.items.filter((i) => !i.done && !i.stretch) };
+  Store.save('today');
+}
+
+function pickInitialResult() {
+  if (S.result && !S.resultExample) return;
+  const e = S.log[0];
+  if (!e) { S.result = EXAMPLE_RESULT; S.resultExample = true; S.resultEntry = null; return; }
+  if ((!e.choice || e.choice === 'wait') && e.r && Date.now() - e.at < 12 * 3600e3) {
+    S.result = e.r; S.resultExample = false; S.resultEntry = e.id; return;
+  }
+  S.result = null; S.resultExample = false; S.resultEntry = null;
+}
+
+/* ======================= Claude ======================= */
+async function callReason(prompt) {
+  try {
+    const res = await fetch('/.netlify/functions/reason', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      const e = new Error(err.error || 'API error');
+      e.code = 'upstream_error';
+      throw e;
+    }
+    return await res.json();
+  } catch (err) {
+    const e = new Error(err.message || 'Network error');
+    e.code = err.code || 'upstream_error';
+    throw e;
+  }
+}
+
+async function callSort(prompt) {
+  try {
+    const res = await fetch('/.netlify/functions/sort', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      const e = new Error(err.error || 'API error');
+      e.code = 'upstream_error';
+      throw e;
+    }
+    return await res.json();
+  } catch (err) {
+    const e = new Error(err.message || 'Network error');
+    e.code = err.code || 'upstream_error';
+    throw e;
+  }
+}
+const HIDE_CODES = ['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'];
+function errorCopy(code) {
+  switch (code) {
+    case 'rate_limited': return 'Claude is busy or you’ve reached a usage limit. Try again in a little while.';
+    case 'session_expired': return 'Your Claude session ended. Sign in again, then try once more.';
+    case 'refused': return 'Claude didn’t take this one on. Try describing the decision differently.';
+    case 'prompt_too_large': return 'That’s a lot to weigh at once. Try a shorter description.';
+    default: return 'That didn’t come through cleanly. Try again.';
+  }
+}
+
+const ENGINE_RULES = `You are the reasoning engine inside Second Thought, an app that works like an external prefrontal cortex. Someone is about to make a decision, possibly while tired, stressed, low, impulsive, overwhelmed or stuck. Help them think it through for 30 seconds. You do not decide for them, and you never pretend there is one correct answer.
+
+HOW TO THINK
+- Weigh NOW (next minutes to hours), TOMORROW (energy, mood, sleep, money, work, relationships), LONG TERM (their stated goals), EFFORT (of the alternative), REVERSIBILITY, RISK (the downside if it goes badly) and REWARD (the likely benefit).
+- Use their state only when it matters for this decision. Infer it from their wording when it is obvious ("I need this right now", "I'm exhausted"). Otherwise don't mention it.
+- Only mention consequences that plausibly follow from what they told you. Never invent facts about them. If an important part can't be judged, say so in "unknown".
+- Flags (0-4): only those that clearly apply, each explaining WHY in one sentence. Green examples: aligns with a goal, cheap or reversible, low downside, solves the actual problem, meaningful benefit, easy to do, reduces future problems. Red examples: impulse purchase, immediate reward with delayed cost, contradicts an important goal, driven mainly by emotional urgency, trying to remove all uncertainty, perfectionism, endless research, "I need this right now", avoiding an important task with a rewarding distraction, escalating commitment, rationalizing something already decided emotionally.
+- Reasoning check: at most one pattern, only if genuinely relevant: emotional reasoning, confirmation bias, sunk cost, perfectionism, all-or-nothing thinking, present bias, novelty seeking, avoidance, analysis paralysis, false urgency, catastrophizing, over-optimization, decision fatigue. Otherwise null.
+- Optimal stopping (the 37% rule): only when they are exploring options with no objectively right answer (flats, products, candidates, places) and have already seen a reasonable number. Explain it plainly in one or two sentences. Otherwise null.
+- Recommendation: the simplest reasonable next step, offered as your read, not the answer. Waiting often suits impulses; a 5-minute start often suits avoided tasks; "good enough" often suits over-research.
+- Alternative: exactly one. It may be imperfect, less exciting or inconvenient, but should have a better overall balance of upsides and downsides. Concrete and doable today.
+- Safety: if this involves self-harm or suicide, dangerous substance use, a medical emergency, serious financial loss (a large share of savings, borrowing to gamble), illegal activity, violence or immediate physical danger, fill "safety" and do not optimize the plan. Calmly point to appropriate professional or emergency help. Leave the other lists empty.
+
+HOW TO WRITE
+- Tradeoffs, not morals. Never "you shouldn't". Never diagnose: "this may be present bias", not "you have present bias".
+- Probabilistic words: likely, may, could, based on what you've told me. Never certainty.
+- List items under 8 words. Short, plain sentences. Warm and direct. No exclamation marks, no emoji, no therapy-speak.
+- Keep their currency and units.`;
+
+const ENGINE_SHAPE = `Reply with only one JSON object in this shape:
+{
+  "considering": "their decision restated in under 10 words",
+  "headline": "the main tradeoff in one sentence",
+  "why": ["2-3 short reasons for"],
+  "whyNot": ["2-3 short reasons against"],
+  "impact": {
+    "now": {"sign": "+", "note": "1-3 words"},
+    "tomorrow": {"sign": "-", "note": "1-3 words"},
+    "longTerm": {"sign": "~", "note": "1-3 words"}
+  },
+  "goals": [{"name": "the goal it touches, in their words", "effect": "supports | conflicts | neutral | unclear", "note": "one short sentence"}],
+  "flags": [{"type": "green | red", "label": "3-6 words", "why": "one sentence"}],
+  "check": {"pattern": "present bias", "text": "This may be present bias: ..."},
+  "stopping": {"text": "..."},
+  "dims": {"effort": "low | medium | high", "reversibility": "easy | partial | hard", "risk": "low | medium | high", "reward": "low | medium | high"},
+  "lean": "do | dont | wait | depends",
+  "reasoning": "your read in 1-2 sentences",
+  "alternative": "one concrete alternative in one sentence",
+  "waitMinutes": 20,
+  "unknown": "what you can't judge from this, in one sentence",
+  "safety": null
+}
+Signs: "+" helps, "-" hurts, "~" neutral or mixed, "?" can't tell. "goals": at most two, empty if none is set or touched. "check", "stopping" and "unknown" are null when they don't apply. "waitMinutes": a useful pause length when lean is "wait", otherwise null. When safety applies: "safety": {"level": "urgent | caution", "message": "2-3 calm sentences", "resources": ["short pointers to real help"]}.`;
+
+function ago(ms) {
+  const m = Math.round(ms / 60000);
+  if (m < 2) return 'just now';
+  if (m < 60) return m + ' min ago';
+  return Math.round(m / 60) + ' h ago';
+}
+const CHOICE_WORDS = { do: 'did it', dont: 'didn’t', wait: 'waiting', 'waited-do': 'waited, then did it', 'waited-dont': 'waited, let it go' };
+
+function buildDecisionPrompt(text) {
+  const when = new Date().toLocaleString('en-GB', { weekday: 'long', hour: '2-digit', minute: '2-digit' });
+  const mood = currentMood();
+  const goals = S.goalsExample ? [] : S.goals;
+  const open = S.dayExample ? [] : S.day.items.filter((i) => !i.done).map((i) => i.text + ' (' + i.tier + ')');
+  const recent = S.log.filter((e) => e.choice).slice(0, 5).map((e) => '"' + e.text + '": ' + CHOICE_WORDS[e.choice]);
+  return [
+    ENGINE_RULES, '',
+    'CONTEXT',
+    '- Local time: ' + when,
+    '- Long-term goals: ' + (goals.length ? goals.join('; ') : 'none set yet'),
+    '- Open tasks today: ' + (open.length ? open.join('; ') : 'none listed'),
+    '- State they tapped: ' + (mood ? mood.label + ' (' + ago(Date.now() - S.mood.at) + ')' : 'not given; infer only from their words, if at all'),
+    '- Recent decisions: ' + (recent.length ? recent.join('; ') : 'none'),
+    '', 'THE DECISION, IN THEIR WORDS:', text.slice(0, 1500), '',
+    ENGINE_SHAPE,
+  ].join('\n');
+}
+
+function normalizeResult(raw, text) {
+  const o = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  const str = (v) => (typeof v === 'string' ? v.trim() : '');
+  const list = (v, n) => (Array.isArray(v) ? v : []).map(str).filter(Boolean).slice(0, n);
+  const sign = (v) => {
+    const s = String(v ?? '').trim();
+    if (/^(\+|pos|good|help|up)/i.test(s)) return '+';
+    if (/^(-|−|–|neg|bad|hurt|cost|down)/i.test(s)) return '-';
+    if (/^(~|0|neutral|mixed|flat)/i.test(s)) return '~';
+    return '?';
+  };
+  const cell = (c) => ({ sign: sign(c && c.sign), note: str(c && c.note) });
+  const lvl = (v, ok) => (ok.includes(v) ? v : null);
+  const d = o.dims || {};
+  const wm = Number(o.waitMinutes);
+  return {
+    considering: str(o.considering) || text,
+    headline: str(o.headline),
+    why: list(o.why, 4),
+    whyNot: list(o.whyNot, 4),
+    impact: { now: cell(o.impact && o.impact.now), tomorrow: cell(o.impact && o.impact.tomorrow), longTerm: cell(o.impact && o.impact.longTerm) },
+    goals: (Array.isArray(o.goals) ? o.goals : []).filter((g) => g && str(g.name)).slice(0, 2)
+      .map((g) => ({ name: str(g.name), effect: ['supports', 'conflicts', 'neutral', 'unclear'].includes(g.effect) ? g.effect : 'unclear', note: str(g.note) })),
+    flags: (Array.isArray(o.flags) ? o.flags : []).filter((f) => f && str(f.label)).slice(0, 4)
+      .map((f) => ({ type: f.type === 'green' ? 'green' : 'red', label: str(f.label), why: str(f.why) })),
+    check: o.check && str(o.check.text) ? { pattern: str(o.check.pattern), text: str(o.check.text) } : null,
+    stopping: o.stopping && str(o.stopping.text) ? { text: str(o.stopping.text) } : null,
+    dims: {
+      effort: lvl(d.effort, ['low', 'medium', 'high']), reversibility: lvl(d.reversibility, ['easy', 'partial', 'hard']),
+      risk: lvl(d.risk, ['low', 'medium', 'high']), reward: lvl(d.reward, ['low', 'medium', 'high']),
+    },
+    lean: ['do', 'dont', 'wait', 'depends'].includes(o.lean) ? o.lean : 'depends',
+    reasoning: str(o.reasoning),
+    alternative: str(o.alternative),
+    waitMinutes: wm > 0 ? Math.min(1440, Math.max(5, Math.round(wm))) : 20,
+    unknown: str(o.unknown),
+    safety: o.safety && typeof o.safety === 'object' && str(o.safety.message)
+      ? { urgent: o.safety.level === 'urgent', message: str(o.safety.message), resources: list(o.safety.resources, 4) }
+      : null,
+  };
+}
+
+/* Local safety net: these never go through pros and cons. */
+const SELF_HARM = /\b(kill(ing)?\s+my\s*self|suicid\w*|end(ing)?\s+(my|it)\s+(life|all)|take\s+my\s+(own\s+)?life|hurt(ing)?\s+my\s*self|self[-\s]?harm\w*|cut(ting)?\s+my\s*self|want\s+to\s+die|don'?t\s+want\s+to\s+(live|be\s+alive|be\s+here|wake\s+up))\b/i;
+const EMERGENCY = /\b(overdos\w*|chest\s+pain|can'?t\s+breathe|not\s+breathing|unconscious|seizure)\b/i;
+
+/* ======================= decide flow ======================= */
+let ctl = null;
+let phaseTimer = 0;
+const PHASES = ['Looking at the next few hours', 'Checking what it does to tomorrow', 'Holding it up against your goals', 'Looking for traps in the reasoning', 'Finding one alternative'];
+
+function setThinking(on) {
+  S.thinking = on;
+  $('#thinking').hidden = !on;
+  $('#result').hidden = on;
+  $('#thinkBtn').disabled = on;
+  clearInterval(phaseTimer);
+  if (on) {
+    let i = 0;
+    $('#thinkStatus').textContent = PHASES[0];
+    phaseTimer = setInterval(() => { i = (i + 1) % PHASES.length; $('#thinkStatus').textContent = PHASES[i]; }, 3200);
+    Trace.start();
+  } else {
+    Trace.stop();
+  }
+}
+function showNotice(msg) { const n = $('#notice'); n.textContent = msg || ''; n.hidden = !msg; }
+
+async function think(raw) {
+  const text = String(raw || '').trim();
+  if (!text) { $('#q').focus(); return; }
+  if (S.thinking) return;
+  showNotice('');
+  if (SELF_HARM.test(text) || EMERGENCY.test(text)) {
+    S.result = { localSafety: SELF_HARM.test(text) ? 'self' : 'emergency', considering: text };
+    S.resultExample = false; S.resultEntry = null;
+    renderResult(true); return;
+  }
+  setThinking(true);
+  try {
+    const out = await callReason(buildDecisionPrompt(text));
+    const r = normalizeResult(out, text);
+    if (r.safety) {
+      S.result = r; S.resultEntry = null;
+    } else {
+      const entry = { id: newId(), at: Date.now(), text: r.considering, lean: r.lean, choice: null, r };
+      S.log.unshift(entry); S.log = S.log.slice(0, 30);
+      S.result = r; S.resultEntry = entry.id;
+      Store.save('log');
+    }
+    S.resultExample = false;
+    setThinking(false);
+    renderResult(true); renderRail(); renderPending();
+  } catch (e) {
+    setThinking(false);
+    const code = e && e.code;
+    if (code === 'cancelled') { renderResult(); return; }
+    renderResult();
+    showNotice(errorCopy(code));
+  }
+}
+
+function selfCheck(text) {
+  const r = { selfCheck: true, considering: text, waitMinutes: 20, lean: 'depends' };
+  const entry = { id: newId(), at: Date.now(), text, lean: 'depends', choice: null, r };
+  S.log.unshift(entry); S.log = S.log.slice(0, 30);
+  S.result = r; S.resultEntry = entry.id; S.resultExample = false;
+  Store.save('log');
+  renderResult(true); renderRail();
+}
+
+function choose(choice) {
+  const e = S.log.find((x) => x.id === S.resultEntry);
+  if (!e) return;
+  e.decidedAt = Date.now();
+  if (choice === 'wait') { e.choice = 'wait'; e.waitUntil = Date.now() + ((S.result && S.result.waitMinutes) || 20) * 60e3; }
+  else e.choice = choice === 'do' ? 'do' : 'dont';
+  Store.save('log');
+  renderResult(); renderRail(); renderPending();
+}
+function resolveWait(id, choice) {
+  const e = S.log.find((x) => x.id === id);
+  if (!e) return;
+  e.choice = choice === 'do' ? 'waited-do' : 'waited-dont';
+  e.decidedAt = Date.now();
+  Store.save('log');
+  renderResult(); renderRail(); renderPending();
+}
+function openEntry(id) {
+  const e = S.log.find((x) => x.id === id);
+  if (!e || !e.r) return;
+  S.result = e.r; S.resultEntry = e.id; S.resultExample = false;
+  setView('decide'); renderResult(true); renderPending();
+  $('#result').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+}
+function newDecision() {
+  S.result = null; S.resultEntry = null; S.resultExample = false;
+  $('#q').value = ''; autoGrow(); renderResult(); renderPending();
+  $('#q').focus();
+  window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+}
+
+/* ======================= thinking trace ======================= */
+const Trace = {
+  raf: 0, t0: 0, running: false,
+  start() { this.t0 = performance.now(); this.running = true; if (!this.raf) this.loop(); },
+  stop() { this.running = false; cancelAnimationFrame(this.raf); this.raf = 0; },
+  loop() {
+    const cv = $('#trace');
+    const w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !h) { this.raf = this.running ? requestAnimationFrame(() => this.loop()) : 0; return; }
+    const dpr = window.devicePixelRatio || 1;
+    if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    const css = getComputedStyle(document.documentElement);
+    const t = reduceMotion ? 0 : (performance.now() - this.t0) / 1000;
+    // Noise decays toward a steady rhythm the longer it thinks.
+    const chaos = reduceMotion ? 0.35 : 0.28 + 0.72 * Math.exp(-t / 9);
+    ctx.strokeStyle = css.getPropertyValue('--line').trim();
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
+    ctx.strokeStyle = css.getPropertyValue('--ink-2').trim();
+    ctx.lineWidth = 1.5; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (let x = 0; x <= w; x += 2) {
+      const u = x / w, env = Math.sin(Math.PI * u);
+      const calm = Math.sin(u * Math.PI * 5 - t * 1.4) * 0.24;
+      const noise = (Math.sin(u * 41 + t * 6.1) * 0.45 + Math.sin(u * 97 - t * 9.7) * 0.3 + Math.sin(u * 17 + t * 3.3) * 0.35) * chaos;
+      const y = h / 2 - (calm * (1 - chaos * 0.5) + noise) * env * (h * 0.44);
+      if (x) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+    this.raf = this.running && !reduceMotion ? requestAnimationFrame(() => this.loop()) : 0;
+  },
+};
+
+/* ======================= rendering: decide ======================= */
+function stateRow(labelHtml) {
+  const cur = currentMood();
+  return '<span class="label">' + labelHtml + '</span><div class="moods">' + MOODS.map((m) => {
+    const on = cur && cur.key === m.key;
+    return '<button type="button" class="mood' + (on ? ' on' : '') + '" data-act="mood" data-mood="' + m.key + '" aria-pressed="' + !!on + '">'
+      + '<svg viewBox="0 0 28 12" aria-hidden="true"><path class="w-' + m.key + '" d="' + WAVES[m.key] + '"></path></svg>' + m.label + '</button>';
+  }).join('') + '</div>';
+}
+
+function renderDecideStatic() {
+  $(‘#state-decide’).innerHTML = stateRow(‘Right now<span class="opt">optional</span>’);
+  $(‘#thinkHint’).textContent = ‘About 30 seconds. You still decide.’;
+}
+
+const SIGN = {
+  '+': { cls: 'pro', glyph: '+', word: 'helps' },
+  '-': { cls: 'con', glyph: '−', word: 'costs' },
+  '~': { cls: 'mid', glyph: '~', word: 'neutral' },
+  '?': { cls: 'unk', glyph: '?', word: 'unclear' },
+};
+function impactCell(label, c) {
+  const s = SIGN[c.sign] || SIGN['?'];
+  return '<div class="cell ' + s.cls + '"><span class="label">' + label + '</span><span class="sign" aria-label="' + s.word + '">' + s.glyph + '</span><span class="note">' + esc(c.note || s.word) + '</span></div>';
+}
+const GOAL_EFFECT = {
+  supports: ['pro', 'likely supports it'], conflicts: ['con', 'may work against it'],
+  neutral: ['unk', 'likely neutral'], unclear: ['mid', 'hard to tell'],
+};
+const DIM_TONE = {
+  reward: { high: 'pro', medium: 'mid', low: 'unk' },
+  risk: { low: 'pro', medium: 'mid', high: 'con' },
+  reversibility: { easy: 'pro', partial: 'mid', hard: 'con' },
+  effort: { low: 'pro', medium: 'mid', high: 'con' },
+};
+const LEAN = { do: ['pro', 'Leaning: do it'], dont: ['con', 'Leaning: skip it'], wait: ['mid', 'Leaning: wait'], depends: ['unk', 'It depends'] };
+
+function waitLabel(min) {
+  if (min >= 480) return 'Sleep on it';
+  if (min >= 60) return 'Wait ' + Math.round(min / 60) + ' h';
+  return 'Wait ' + min + ' min';
+}
+function fmtLeft(ms) {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  return h ? h + ':' + String(m).padStart(2, '0') + ' h' : m + ':' + String(sec).padStart(2, '0');
+}
+function choiceWord(e) {
+  return { do: 'Did it', dont: 'Didn’t', wait: 'Waiting', 'waited-do': 'Waited, did it', 'waited-dont': 'Waited, let go' }[e.choice] || 'Open';
+}
+
+function actionsBlock(r) {
+  if (S.resultExample) {
+    return '<footer class="r-foot"><p class="muted small">This is an example. Describe your own decision above and it gets the same treatment.</p></footer>';
+  }
+  const e = S.log.find((x) => x.id === S.resultEntry);
+  if (!e) return '';
+  if (!e.choice) {
+    const btn = (c, label) => '<button type="button" class="btn choice' + (r.lean === c ? ' is-lean' : '') + '" data-act="choose" data-choice="' + c + '">'
+      + label + (r.lean === c ? '<span class="lean-mark">my read</span>' : '') + '</button>';
+    return '<footer class="r-foot"><div class="choices">' + btn('do', 'Do it') + btn('dont', 'Don’t do it') + btn('wait', waitLabel(r.waitMinutes || 20))
+      + '</div><p class="muted small">Your call. This is a second opinion, not a verdict.</p></footer>';
+  }
+  if (e.choice === 'wait') return waitBlock(e);
+  return '<footer class="r-foot decided"><p><span class="chip unk">' + choiceWord(e) + '</span><span class="muted">Logged.</span>'
+    + '<button type="button" class="link" data-act="new">Think through something else</button></p></footer>';
+}
+
+function waitBlock(e) {
+  const left = e.waitUntil - Date.now();
+  if (left > 0) {
+    const total = Math.max(1, e.waitUntil - (e.decidedAt || e.at));
+    return '<footer class="r-foot"><div class="wait">'
+      + '<svg class="ring" viewBox="0 0 44 44" aria-hidden="true"><circle class="ring-bg" cx="22" cy="22" r="19"></circle>'
+      + '<circle class="ring-fg" id="waitRing" cx="22" cy="22" r="19" style="stroke-dashoffset:' + (119.38 * (1 - left / total)).toFixed(2) + '"></circle></svg>'
+      + '<div class="wait-body"><p class="wait-time" id="waitTime">' + fmtLeft(left) + '</p>'
+      + '<p>The option stays open. Do something you enjoy for a bit, then come back to this.</p>'
+      + '<div class="choices"><button type="button" class="btn" data-act="resolve" data-id="' + e.id + '" data-choice="dont">Let it go</button>'
+      + '<button type="button" class="btn" data-act="resolve" data-id="' + e.id + '" data-choice="do">Decide now: do it</button></div></div></div></footer>';
+  }
+  return '<footer class="r-foot"><div class="wait-body"><p class="label">Time’s up</p>'
+    + '<p style="font-family:var(--voice);font-size:22px">Do you still want it?</p>'
+    + '<div class="choices"><button type="button" class="btn choice" data-act="resolve" data-id="' + e.id + '" data-choice="do">Yes, do it</button>'
+    + '<button type="button" class="btn choice" data-act="resolve" data-id="' + e.id + '" data-choice="dont">Let it go</button></div></div></footer>';
+}
+
+function safetyCard(r) {
+  let title, message, extra = '';
+  if (r.localSafety) {
+    const self = r.localSafety === 'self';
+    title = self ? 'This matters more than a list of pros and cons.' : 'This sounds like it could be urgent.';
+    message = self
+      ? 'If you’re thinking about hurting yourself, you deserve support from a real person right now. You don’t have to decide anything else tonight. Reaching out to one person you trust counts.'
+      : 'If someone may be in physical danger or needs medical help, contact emergency services first. The weighing can wait.';
+  } else {
+    title = r.safety.urgent ? 'Safety first.' : 'This one needs more than a quick weigh-up.';
+    message = r.safety.message;
+    if (r.safety.resources.length) extra = r.safety.resources.map((x) => '<li>' + esc(x) + '</li>').join('');
+  }
+  const urgent = r.localSafety || (r.safety && r.safety.urgent);
+  const lines = urgent
+    ? '<li><span class="label">Immediate danger</span><span><span class="num">112</span> Europe · <span class="num">911</span> US and Canada · <span class="num">999</span> UK</span></li>'
+      + '<li><span class="label">Talk to someone now</span><span>Free, confidential crisis lines for your country: <a href="https://findahelpline.com" target="_blank" rel="noopener">findahelpline.com</a>. In the US, call or text <span class="num">988</span>.</span></li>'
+    : '';
+  return '<article class="card safety' + '"><div><p class="label">Pausing the analysis</p><h2>' + esc(title) + '</h2></div>'
+    + '<p>' + esc(message) + '</p>' + (lines || extra ? '<ul class="help">' + lines + extra + '</ul>' : '')
+    + '<p class="muted small">Second Thought is a reasoning aid, not an emergency, medical or legal service.</p></article>';
+}
+
+function selfCheckCard(r) {
+  const goals = S.goalsExample ? [] : S.goals;
+  const qs = [
+    ['Now', 'What does this give you in the next few hours?'],
+    ['Tomorrow', 'What might it cost tomorrow: sleep, money, energy, mood?'],
+    ['Goals', goals.length ? 'Does it move you toward or away from ' + goals.slice(0, 3).join(', ') + '?' : 'Does it move you toward or away from what you want this year?'],
+    ['Undo', 'If it goes badly, can you easily undo it?'],
+    ['Worst case', 'What’s the realistic downside, not the dramatic one?'],
+  ];
+  return '<div><div class="r-meta"><span class="label">Considering</span><span class="tag">Self-check</span></div><p class="considering">' + esc(r.considering) + '</p>'
+    + '<p class="headline">Claude isn’t reachable from this view, so here’s the 30-second version to run yourself.</p></div>'
+    + '<div class="sc">' + qs.map(([l, q]) => '<span class="label">' + l + '</span><p>' + esc(q) + '</p>').join('') + '</div>'
+    + '<div class="check"><span class="half"></span><p style="margin:0">If two or more answers worry you, waiting 20 minutes costs little and keeps the option open.</p></div>';
+}
+
+function renderResult(fresh) {
+  const box = $('#result');
+  const r = S.result;
+  if (!r) { box.innerHTML = ''; return; }
+  if (r.localSafety || r.safety) { box.innerHTML = safetyCard(r); return; }
+  let html;
+  if (r.selfCheck) {
+    html = selfCheckCard(r);
+  } else {
+    const lean = LEAN[r.lean] || LEAN.depends;
+    const dims = [['reward', 'Reward'], ['risk', 'Risk'], ['reversibility', 'Undo'], ['effort', 'Alt. effort']]
+      .filter(([k]) => r.dims[k])
+      .map(([k, label]) => '<span class="' + DIM_TONE[k][r.dims[k]] + '"><i class="dot"></i>' + label + ' <b>' + r.dims[k] + '</b></span>').join('');
+    html = '<div><div class="r-meta"><span class="label">Considering</span>' + (S.resultExample ? '<span class="tag">Example</span>' : '') + '</div>'
+      + '<p class="considering">' + esc(r.considering) + '</p>' + (r.headline ? '<p class="headline">' + esc(r.headline) + '</p>' : '') + '</div>'
+      + '<div class="impact" aria-label="Impact over time">' + impactCell('Now', r.impact.now) + impactCell('Tomorrow', r.impact.tomorrow) + impactCell('Long term', r.impact.longTerm) + '</div>'
+      + '<div class="whys">'
+      + '<div class="pro"><h3 class="label">Why</h3><ul class="dots">' + (r.why.map((x) => '<li>' + esc(x) + '</li>').join('') || '<li>Nothing obvious</li>') + '</ul></div>'
+      + '<div class="con"><h3 class="label">Why not</h3><ul class="dots">' + (r.whyNot.map((x) => '<li>' + esc(x) + '</li>').join('') || '<li>Nothing obvious</li>') + '</ul></div></div>'
+      + r.goals.map((g) => {
+        const [cls, word] = GOAL_EFFECT[g.effect];
+        return '<div class="goal-line ' + cls + '"><i class="dot"></i><span class="label">Goal</span><b>' + esc(g.name) + '</b><span class="eff">' + word + '</span>'
+          + (g.note ? '<span class="gnote">' + esc(g.note) + '</span>' : '') + '</div>';
+      }).join('')
+      + (r.flags.length ? '<ul class="flags">' + r.flags.map((f) => '<li class="flag ' + (f.type === 'green' ? 'pro' : 'con') + '"><i class="dot"></i><div><b><span class="sr">'
+        + (f.type === 'green' ? 'Green flag: ' : 'Red flag: ') + '</span>' + esc(f.label) + '</b>' + (f.why ? '<p>' + esc(f.why) + '</p>' : '') + '</div></li>').join('') + '</ul>' : '')
+      + (r.check ? '<div class="check"><span class="half"></span><div><span class="label">Reasoning check' + (r.check.pattern ? ' · ' + esc(r.check.pattern) : '') + '</span><p>' + esc(r.check.text) + '</p></div></div>' : '')
+      + (r.stopping ? '<div class="stopping"><span class="label">Optimal stopping · the 37% rule</span><div class="stop-bar"><span></span></div>'
+        + '<div class="stop-legend"><span>Look</span><span>Then take the next one that beats them</span></div><p>' + esc(r.stopping.text) + '</p></div>' : '')
+      + (dims ? '<div class="dims">' + dims + '</div>' : '')
+      + '<hr class="sep">'
+      + '<div class="read"><div class="head"><span class="label">My read</span><span class="chip ' + lean[0] + '">' + lean[1] + '</span></div><p class="voice">' + esc(r.reasoning) + '</p></div>'
+      + (r.alternative ? '<div class="alt"><span class="label">One alternative</span><p>' + esc(r.alternative) + '</p></div>' : '')
+      + (r.unknown ? '<p class="unknown"><span class="q">?</span><span>' + esc(r.unknown) + '</span></p>' : '');
+  }
+  box.innerHTML = '<article class="card' + (fresh && !reduceMotion ? ' fresh' : '') + '">' + html + actionsBlock(r) + '</article>';
+}
+
+function renderPending() {
+  const box = $('#pending');
+  const e = S.log.find((x) => x.choice === 'wait');
+  if (!e || S.resultEntry === e.id) { box.hidden = true; box.innerHTML = ''; return; }
+  const left = e.waitUntil - Date.now();
+  box.hidden = false;
+  box.innerHTML = '<span class="label">Waiting on</span><span class="p-text">' + esc(e.text) + '</span>'
+    + '<span class="p-left" id="pendingLeft">' + (left > 0 ? fmtLeft(left) + ' left' : 'Time’s up') + '</span>'
+    + '<button type="button" class="link" data-act="open" data-id="' + e.id + '">Open</button>';
+}
+
+function tick() {
+  const e = S.log.find((x) => x.choice === 'wait');
+  if (!e) return;
+  const left = e.waitUntil - Date.now();
+  const p = $('#pendingLeft');
+  if (p) p.textContent = left > 0 ? fmtLeft(left) + ' left' : 'Time’s up';
+  if (S.resultEntry !== e.id) return;
+  const t = $('#waitTime'), ring = $('#waitRing');
+  if (left <= 0) { if (t) renderResult(); return; }
+  if (t) t.textContent = fmtLeft(left);
+  if (ring) {
+    const total = Math.max(1, e.waitUntil - (e.decidedAt || e.at));
+    ring.style.strokeDashoffset = (119.38 * (1 - left / total)).toFixed(2);
+  }
+}
+
+/* ======================= rendering: today ======================= */
+function renderToday() {
+  $('#todayDate').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+  $('#state-today').innerHTML = stateRow('How much is in the tank?<span class="opt">optional</span>');
+  const items = S.day.items;
+  const groups = { must: items.filter((i) => i.tier === 'must'), should: items.filter((i) => i.tier === 'should'), could: items.filter((i) => i.tier === 'could') };
+  const mood = currentMood();
+  let plan = {};
+  try { plan = shapeDay({ must: groups.must.slice(), should: groups.should.slice(), could: groups.could.slice() }, mood ? mood.key : null) || {}; }
+  catch (err) { console.error('shapeDay failed', err); }
+  const shown = {};
+  for (const k of TIERS) shown[k] = Array.isArray(plan[k]) ? plan[k].filter((i) => i && items.includes(i)) : groups[k];
+  const shownIds = new Set(TIERS.flatMap((k) => shown[k].map((i) => i.id)));
+  const tucked = items.filter((i) => !shownIds.has(i.id));
+
+  const row = (i) => {
+    const useSmall = plan.small && !i.done;
+    const main = useSmall && i.small ? i.small : i.text;
+    const sub = useSmall ? (i.small ? 'Full version: ' + i.text : 'Any 5 minutes of it counts') : '';
+    return '<li class="item' + (i.done ? ' done' : '') + '">'
+      + '<button type="button" class="check-btn" data-act="toggle" data-id="' + i.id + '" aria-pressed="' + i.done + '" aria-label="Done: ' + esc(i.text) + '"></button>'
+      + '<div><span class="main">' + esc(main) + '</span>' + (sub ? '<span class="sub">' + esc(sub) + '</span>' : '') + '</div>'
+      + '<button type="button" class="tier-chip t-' + i.tier + '" data-act="tier" data-id="' + i.id + '" title="Change priority">' + i.tier + '</button>'
+      + '<button type="button" class="x" data-act="remove" data-id="' + i.id + '" aria-label="Remove ' + esc(i.text) + '">×</button></li>';
+  };
+  const section = (k, label) => {
+    if (!shown[k].length) return '';
+    const opt = plan.optional && k !== 'must' ? '<span class="small muted">optional today</span>' : '';
+    return '<section class="tier"><div class="tier-head"><h2 class="label">' + label + '</h2>' + opt + '</div><ul>' + shown[k].map(row).join('') + '</ul></section>';
+  };
+
+  let html = '';
+  if (S.dayExample) {
+    html += '<div class="example-bar"><span class="tag">Example day</span><span>Tick, edit or remove anything to make it yours.</span>'
+      + '<button type="button" class="link" data-act="clearday">Start empty</button></div>';
+  }
+  if (plan.note) html += '<p class="day-note">' + esc(plan.note) + '</p>';
+  const mustDone = groups.must.filter((i) => i.done).length;
+  if (groups.must.length) {
+    const all = mustDone === groups.must.length;
+    html += '<div class="progress"><span>' + (all ? 'Essentials done. Anything else is a bonus.' : 'Essentials <b>' + mustDone + ' of ' + groups.must.length + '</b>') + '</span>'
+      + '<span class="segs" aria-hidden="true">' + groups.must.map((i) => '<i class="' + (i.done ? 'on' : '') + '"></i>').join('') + '</span></div>';
+  }
+  html += section('must', 'Must') + section('should', 'Should') + section('could', 'Could');
+  if (tucked.length) {
+    html += '<div><button type="button" class="link small" data-act="tucked">' + (S.showTucked ? 'Hide the rest' : tucked.length + ' more tucked away for today · show') + '</button></div>';
+    if (S.showTucked) html += '<section class="tier"><div class="tier-head"><h2 class="label">Tucked away</h2></div><ul>' + tucked.map(row).join('') + '</ul></section>';
+  }
+  if (plan.stretch && !items.some((i) => i.stretch)) {
+    const goals = S.goalsExample ? [] : S.goals;
+    html += '<div class="stretch"><span class="label">Room for one more</span><p>You have capacity for one thing that moves a long-term goal.</p>'
+      + (goals.length
+        ? '<div class="examples">' + goals.map((g) => '<button type="button" class="pill" data-act="stretch" data-goal="' + esc(g) + '">' + esc(g) + '</button>').join('') + '</div>'
+        : '<p class="small muted">Add a long-term goal and it will show up here.</p>')
+      + '</div>';
+  }
+  if (!items.length) html += '<p class="empty">Nothing here yet. Add what today needs, including the small stuff like eating.</p>';
+  $('#dayBody').innerHTML = html;
+
+  const open = items.filter((i) => !i.done).length;
+  const sortBtn = $('#sortBtn');
+  sortBtn.disabled = S.sorting || S.dayExample || !open;
+  $('#sortStatus').textContent = S.sorting ? 'Sorting…'
+    : S.dayExample ? 'Add your own items first, then Claude can sort them.' : 'Claude splits it into must, should and could, and finds a 5-minute version of each.';
+}
+
+/* ======================= rendering: rail ======================= */
+function renderRail() {
+  $('#goals').innerHTML = S.goals.map((g, i) => '<li><span>' + esc(g) + '</span><button type="button" class="x" data-act="rmgoal" data-i="' + i + '" aria-label="Remove goal ' + esc(g) + '">×</button></li>').join('')
+    || '<li class="empty">No goals yet. One or two that matter this season is plenty.</li>';
+  $('#goalsNote').hidden = !S.goalsExample;
+  const recent = S.log.slice(0, 6);
+  $('#recentBlock').hidden = !recent.length;
+  $('#recent').innerHTML = recent.map((e) => '<li><button type="button" class="recent" data-act="open" data-id="' + e.id + '"><span class="r-text">' + esc(e.text) + '</span>'
+    + '<span class="chip ' + (e.choice === 'wait' ? 'mid' : 'unk') + '">' + choiceWord(e) + '</span></button></li>').join('');
+  const waited = S.log.filter((e) => e.choice === 'waited-do' || e.choice === 'waited-dont');
+  const letGo = waited.filter((e) => e.choice === 'waited-dont').length;
+  const stat = $('#waitStat');
+  stat.hidden = waited.length < 2;
+  stat.textContent = 'After waiting, you let it go ' + letGo + ' of ' + waited.length + ' times.';
+}
+
+function renderAll() {
+  renderDecideStatic(); renderPending(); renderResult(); renderToday(); renderRail();
+}
+
+/* ======================= today actions ======================= */
+function adoptDay() { if (S.dayExample) S.dayExample = false; }
+function findItem(id) { return S.day.items.find((i) => i.id === id); }
+
+function addItem(text) {
+  text = text.trim().slice(0, 80);
+  if (!text) return;
+  if (S.dayExample) { S.day.items = []; S.dayExample = false; }
+  S.day.items.push({ id: newId(), text, tier: 'should', small: '', done: false, stretch: false });
+  Store.save('today'); renderToday();
+}
+async function sortDay() {
+  const open = S.day.items.filter((i) => !i.done);
+  if (!open.length || S.sorting) return;
+  S.sorting = true; renderToday();
+  const mood = currentMood();
+  const prompt = [
+    'You help someone build a minimum viable day: the smallest plan that protects what matters. Not a productivity schedule.',
+    '',
+    'Long-term goals: ' + (S.goalsExample || !S.goals.length ? 'none set' : S.goals.join('; ')),
+    'How they feel right now: ' + (mood ? mood.label : 'not given'),
+    'Local time: ' + new Date().toLocaleString('en-GB', { weekday: 'long', hour: '2-digit', minute: '2-digit' }),
+    'Items (id: text):',
+    ...open.map((i) => '- ' + i.id + ': ' + i.text),
+    '',
+    'For each item choose a tier. "must": would cause a real problem if skipped today (deadlines, commitments to others, basic needs); at most 3. "should": useful or moves a goal, survivable if skipped. "could": optional, enjoyable or restful.',
+    'Also write "small": the 5-minute version of the item, under 7 words.',
+    'If a basic need such as eating is clearly missing, you may add one item.',
+    'Reply with only JSON: {"items":[{"id":"...","tier":"must","small":"..."}],"add":[{"text":"...","tier":"must","small":"..."}]}',
+  ].join('\n');
+  try {
+    const out = await callSort(prompt);
+    const got = new Map((out && Array.isArray(out.items) ? out.items : []).filter((x) => x && x.id).map((x) => [String(x.id), x]));
+    for (const i of S.day.items) {
+      const x = got.get(i.id);
+      if (!x) continue;
+      if (TIERS.includes(x.tier)) i.tier = x.tier;
+      if (typeof x.small === 'string' && x.small.trim()) i.small = x.small.trim().slice(0, 80);
+    }
+    const add = out && Array.isArray(out.add) ? out.add : [];
+    for (const a of add.slice(0, 1)) {
+      if (a && typeof a.text === 'string' && a.text.trim()) {
+        S.day.items.unshift({ id: newId(), text: a.text.trim().slice(0, 80), tier: TIERS.includes(a.tier) ? a.tier : 'must', small: String(a.small || '').slice(0, 80), done: false, stretch: false });
+      }
+    }
+    Store.save('today');
+    S.sorting = false; renderToday();
+  } catch (e) {
+    S.sorting = false;
+    renderToday();
+    $('#sortStatus').textContent = errorCopy(e && e.code);
+  }
+}
+
+/* ======================= events ======================= */
+function setView(v) {
+  S.view = v === 'today' ? 'today' : 'decide';
+  $('#view-decide').hidden = S.view !== 'decide';
+  $('#view-today').hidden = S.view !== 'today';
+  $('#tab-decide').setAttribute('aria-selected', String(S.view === 'decide'));
+  $('#tab-today').setAttribute('aria-selected', String(S.view === 'today'));
+  try { history.replaceState(null, '', '#' + S.view); } catch {}
+  LS.set('view', S.view);
+}
+function setMood(key) {
+  const cur = currentMood();
+  S.mood = cur && cur.key === key ? null : { key, at: Date.now() };
+  Store.save('profile');
+  renderDecideStatic(); renderToday();
+}
+function autoGrow() {
+  const q = $('#q');
+  q.style.height = 'auto';
+  q.style.height = Math.min(q.scrollHeight + 2, 260) + 'px';
+}
+
+document.addEventListener('click', (ev) => {
+  const t = ev.target.closest('[data-act]');
+  if (!t) return;
+  const id = t.dataset.id;
+  switch (t.dataset.act) {
+    case 'view': ev.preventDefault(); setView(t.dataset.view); break;
+    case 'mood': setMood(t.dataset.mood); break;
+    case 'example': $('#q').value = t.dataset.text; autoGrow(); $('#q').focus(); break;
+    case 'stop': if (ctl) ctl.abort(); break;
+    case 'choose': choose(t.dataset.choice); break;
+    case 'resolve': resolveWait(id, t.dataset.choice); break;
+    case 'open': openEntry(id); break;
+    case 'new': newDecision(); break;
+    case 'rmgoal': S.goals.splice(Number(t.dataset.i), 1); S.goalsExample = false; Store.save('profile'); renderRail(); renderToday(); break;
+    case 'toggle': { const i = findItem(id); if (i) { i.done = !i.done; adoptDay(); Store.save('today'); renderToday(); } break; }
+    case 'tier': { const i = findItem(id); if (i) { i.tier = TIERS[(TIERS.indexOf(i.tier) + 1) % 3]; adoptDay(); Store.save('today'); renderToday(); } break; }
+    case 'remove': S.day.items = S.day.items.filter((i) => i.id !== id); adoptDay(); Store.save('today'); renderToday(); break;
+    case 'tucked': S.showTucked = !S.showTucked; renderToday(); break;
+    case 'stretch': {
+      const g = t.dataset.goal;
+      adoptDay();
+      S.day.items.push({ id: newId(), text: g + ': 30 focused minutes', tier: 'should', small: g + ': 5 minutes', done: false, stretch: true });
+      Store.save('today'); renderToday(); break;
+    }
+    case 'sort': sortDay(); break;
+    case 'clearday': S.day.items = []; S.dayExample = false; Store.save('today'); renderToday(); $('#addInput').focus(); break;
+  }
+});
+$('#ask').addEventListener('submit', (ev) => { ev.preventDefault(); think($('#q').value); });
+$('#q').addEventListener('input', autoGrow);
+$('#q').addEventListener('keydown', (ev) => {
+  if (ev.key === 'Enter' && (ev.metaKey || ev.ctrlKey)) { ev.preventDefault(); think($('#q').value); }
+});
+$('#addForm').addEventListener('submit', (ev) => { ev.preventDefault(); addItem($('#addInput').value); $('#addInput').value = ''; });
+$('#goalForm').addEventListener('submit', (ev) => {
+  ev.preventDefault();
+  const g = $('#goalInput').value.trim().slice(0, 60);
+  if (!g) return;
+  if (S.goalsExample) { S.goals = []; S.goalsExample = false; }
+  if (S.goals.length < 8 && !S.goals.includes(g)) S.goals.push(g);
+  $('#goalInput').value = '';
+  Store.save('profile'); renderRail(); renderToday();
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  const before = S.day.date;
+  rollDay();
+  if (S.day.date !== before) renderToday();
+  renderDecideStatic();
+});
+setInterval(tick, 1000);
+
+/* ======================= boot ======================= */
+async function connect() {
+  try {
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    if (!db || !user) return;
+    const uid = await user.id();
+    if (!uid) return;
+    const keys = ['profile', 'today', 'log'];
+    const snaps = await Promise.all(keys.map((k) => db.doc('data/users/' + uid + '/' + k).get().catch(() => null)));
+    Store.db = db; Store.uid = uid;
+    snaps.forEach((snap, n) => {
+      const k = keys[n];
+      if (snap && snap.exists) { APPLY[k](snap.data()); LS.set(k, snap.data()); }
+      else if (LS.get(k)) Store.save(k); // carry what this browser already has into the record
+    });
+    rollDay();
+    if (S.resultExample || !S.result) { S.result = null; pickInitialResult(); }
+    renderAll();
+  } catch (err) {
+    console.warn('Second Thought: storage unavailable, keeping data in this browser only.', err);
+  }
+}
+
+$('#brandPath').setAttribute('d', wavePath('brand', 44, 16, 0.5));
+APPLY.profile(LS.get('profile'));
+APPLY.today(LS.get('today'));
+APPLY.log(LS.get('log'));
+rollDay();
+pickInitialResult();
+setView(location.hash === '#today' ? 'today' : location.hash === '#decide' ? 'decide' : (LS.get('view') || 'decide'));
+renderAll();
+connect();
+})();
+</script>
