@@ -24,10 +24,10 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'anthropic/claude-3-5-sonnet',
+        model: 'anthropic/claude-sonnet-5.5',
         messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-        max_tokens: 2048,
+        temperature: 0.5,
+        max_tokens: 1024,
       }),
     });
 

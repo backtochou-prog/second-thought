@@ -1,4 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Second Thought</title>
+<meta name="description" content="A second opinion for decisions and a calmer plan for the day.">
+<meta name="theme-color" content="#EDEFEB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1117" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" href="/icons/favicon.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Second Thought">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Martian+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
@@ -270,6 +285,8 @@
   .recent:hover .r-text { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); }
   .r-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
+</head>
+<body>
 
 <div class="app">
   <header class="top">
@@ -471,33 +488,18 @@ function currentMood() {
 }
 
 /* ======================= persistence ======================= */
-// Browser storage is a fast local cache; the artifact's db (private per person) is the record when available.
+// Everything lives in this browser's localStorage; nothing leaves the device except prompts sent for analysis.
 const LS = {
   get(k) { try { const v = localStorage.getItem('st:' + k); return v ? JSON.parse(v) : null; } catch { return null; } },
   set(k, v) { try { localStorage.setItem('st:' + k, JSON.stringify(v)); } catch {} },
 };
 const Store = {
-  db: null, uid: null, timers: {}, chains: {},
   snapshot(key) {
     if (key === 'profile') return { goals: S.goalsExample ? null : S.goals, mood: S.mood };
     if (key === 'today') return { date: S.day.date, items: S.dayExample ? null : S.day.items };
     return { entries: S.log.slice(0, 30) };
   },
-  save(key) {
-    LS.set(key, this.snapshot(key));
-    if (!this.db || !this.uid) return;
-    clearTimeout(this.timers[key]);
-    this.timers[key] = setTimeout(() => {
-      const payload = this.snapshot(key);
-      const ref = this.db.doc('data/users/' + this.uid + '/' + key);
-      this.chains[key] = (this.chains[key] || Promise.resolve())
-        .then(() => ref.set(payload))
-        .catch((e) => {
-          console.warn('Second Thought: could not save ' + key, e && e.code);
-          if (e && (e.code === 'invalid_argument' || e.code === 'revoked')) this.db = null; // keep working from this browser
-        });
-    }, 600);
-  },
+  save(key) { LS.set(key, this.snapshot(key)); },
 };
 const normItem = (i) => ({
   id: String(i.id || newId()), text: String(i.text || '').slice(0, 80),
@@ -849,8 +851,8 @@ function stateRow(labelHtml) {
 }
 
 function renderDecideStatic() {
-  $(‘#state-decide’).innerHTML = stateRow(‘Right now<span class="opt">optional</span>’);
-  $(‘#thinkHint’).textContent = ‘About 30 seconds. You still decide.’;
+  $('#state-decide').innerHTML = stateRow('Right now<span class="opt">optional</span>');
+  $('#thinkHint').textContent = 'About 30 seconds. You still decide.';
 }
 
 const SIGN = {
@@ -1242,28 +1244,6 @@ document.addEventListener('visibilitychange', () => {
 setInterval(tick, 1000);
 
 /* ======================= boot ======================= */
-async function connect() {
-  try {
-    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
-    if (!db || !user) return;
-    const uid = await user.id();
-    if (!uid) return;
-    const keys = ['profile', 'today', 'log'];
-    const snaps = await Promise.all(keys.map((k) => db.doc('data/users/' + uid + '/' + k).get().catch(() => null)));
-    Store.db = db; Store.uid = uid;
-    snaps.forEach((snap, n) => {
-      const k = keys[n];
-      if (snap && snap.exists) { APPLY[k](snap.data()); LS.set(k, snap.data()); }
-      else if (LS.get(k)) Store.save(k); // carry what this browser already has into the record
-    });
-    rollDay();
-    if (S.resultExample || !S.result) { S.result = null; pickInitialResult(); }
-    renderAll();
-  } catch (err) {
-    console.warn('Second Thought: storage unavailable, keeping data in this browser only.', err);
-  }
-}
-
 $('#brandPath').setAttribute('d', wavePath('brand', 44, 16, 0.5));
 APPLY.profile(LS.get('profile'));
 APPLY.today(LS.get('today'));
@@ -1272,6 +1252,7 @@ rollDay();
 pickInitialResult();
 setView(location.hash === '#today' ? 'today' : location.hash === '#decide' ? 'decide' : (LS.get('view') || 'decide'));
 renderAll();
-connect();
 })();
 </script>
+</body>
+</html>

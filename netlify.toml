@@ -1,12 +1,3 @@
 [build]
   publish = "."
-  functions = ".netlify/functions"
-
-[env.production]
-  [env.production.context.production.environment]
-    OPENROUTER_API_KEY = ""
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  functions = "netlify/functions"
