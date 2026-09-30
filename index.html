@@ -541,7 +541,7 @@ function pickInitialResult() {
 /* ======================= Claude ======================= */
 async function callReason(prompt) {
   try {
-    const res = await fetch('/.netlify/functions/reason', {
+    const res = await fetch('/api/reason', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt }),
@@ -562,7 +562,7 @@ async function callReason(prompt) {
 
 async function callSort(prompt) {
   try {
-    const res = await fetch('/.netlify/functions/sort', {
+    const res = await fetch('/api/sort', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt }),
