@@ -19,7 +19,7 @@ exports.handler = async (event) => {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://second-thought.netlify.app',
+        'HTTP-Referer': 'https://second-thought-107.netlify.app',
         'X-Title': 'Second Thought',
         'Content-Type': 'application/json',
       },
